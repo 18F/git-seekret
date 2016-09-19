@@ -2,14 +2,14 @@ package main_test
 
 import (
 	. "github.com/apuigsech/git-seekret"
+	"github.com/libgit2/git2go"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
-	"os/exec"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"github.com/libgit2/git2go"
 )
 
 var exePath string
@@ -71,7 +71,7 @@ var _ = Describe("main", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(string(session.Out.Contents())).Should(ContainSubstring("Initialized empty Git repository in "))
 	})
-	AfterEach(func(){
+	AfterEach(func() {
 		// Remove the temp git directory
 		os.RemoveAll(repoDir)
 		// Go back to the old directory
@@ -89,7 +89,7 @@ var _ = Describe("main", func() {
 				Eventually(string(process.Out.Contents())).Should(ContainSubstring(helpCommands))
 			})
 		})
-		Context("when the -h flag is provided", func () {
+		Context("when the -h flag is provided", func() {
 			It("should show the help for the command", func() {
 				process := GitSeekret("-h")
 				Eventually(string(process.Out.Contents())).Should(ContainSubstring(helpName))
