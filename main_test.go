@@ -110,50 +110,97 @@ var _ = Describe("main", func() {
 		Context("when it initialized to a config locally", func() {
 			It("should create the config for the local config.", func() {
 				rulesPath := filepath.Join(os.Getenv("HOME"), ".seekret_rules")
-				By("calling the config --init and checking the output")
-				process := GitSeekret("config", "--init")
-				CheckConfigStdOut(process, rulesPath)
-
-				By("checking the local git config")
-				config, err := GetLocalGitConfig(repoDir)
-				Expect(err).NotTo(HaveOccurred())
-				defer config.Free()
-				// Check the config file
-				CheckConfigFile(config, rulesPath)
-
-				By("calling config again, it should just print out the config again.")
-				process = GitSeekret("config")
-				CheckConfigStdOut(process, rulesPath)
+				InitLocalConfig(rulesPath, repoDir)
 			})
 			It("should create the config for the local config with the rules in a custom location by supplying SEEKRET_RULES_PATH.", func() {
-				By("creating the SEEKRET_RULES_PATH folder")
-				rulesDir, err := ioutil.TempDir("", "repo")
-				Expect(err).NotTo(HaveOccurred())
+				rulesDir := CreateCustomRulesPath()
 				defer os.RemoveAll(rulesDir)
 
-				By("setting the SEEKRET_RULES_PATH")
-				err = os.Setenv("SEEKRET_RULES_PATH", rulesDir)
-				Expect(err).NotTo(HaveOccurred())
-
-				By("calling the config --init and checking the output")
-				process := GitSeekret("config", "--init")
-				CheckConfigStdOut(process, rulesDir)
-
-				By("checking the local git config")
-				config, err := GetLocalGitConfig(repoDir)
-				Expect(err).NotTo(HaveOccurred())
-				defer config.Free()
-				// Check the config file
-				CheckConfigFile(config, rulesDir)
-
-				By("calling config again, it should just print out the config again.")
-				process = GitSeekret("config")
-				CheckConfigStdOut(process, rulesDir)
+				InitLocalConfig(rulesDir, repoDir)
 			})
 		})
 	})
+	Describe("rules", func() {
+		Context("with a configured repository", func() {
+			var rulesDir string
+			BeforeEach(func() {
+				rulesDir = CreateCustomRulesPath()
+				InitLocalConfig(rulesDir, repoDir)
+			})
+			AfterEach(func() {
+				os.RemoveAll(rulesDir)
+			})
+			It("should nothing when there are no rules in the directory", func() {
+				process := GitSeekret("rules")
+				VerifyRules(process, []string{})
 
+			})
+			It("should show rules when there are rules in the rules directory", func() {
+				CopyRuleFixtures(oldDir, rulesDir)
+				process := GitSeekret("rules")
+				VerifyRules(process, []string{"[ ] password.password", "[ ] password.pwd", "[ ] password.pass", "[ ] password.cred"})
+			})
+			It("should allow for rules to be enabled", func() {
+				CopyRuleFixtures(oldDir, rulesDir)
+				process := GitSeekret("rules", "--enable", "password.pwd")
+				VerifyRules(process, []string{"[ ] password.password", "[x] password.pwd", "[ ] password.pass", "[ ] password.cred"})
+			})
+			It("should allow for rules to be disabled", func() {
+				CopyRuleFixtures(oldDir, rulesDir)
+				process := GitSeekret("rules", "--enable", "password.pwd")
+				VerifyRules(process, []string{"[ ] password.password", "[x] password.pwd", "[ ] password.pass", "[ ] password.cred"})
+				process = GitSeekret("rules", "--disable", "password.pwd")
+				VerifyRules(process, []string{"[ ] password.password", "[ ] password.pwd", "[ ] password.pass", "[ ] password.cred"})
+			})
+		})
+	})
 })
+
+func CopyRuleFixtures(oldDir, rulesDir string) {
+	CopyFile(filepath.Join(oldDir, "fixtures", "rules", "password.rule"), filepath.Join(rulesDir, "password.rule"))
+}
+
+func VerifyRules(process *Session, rules []string) {
+	Eventually(string(process.Out.Contents())).Should(ContainSubstring("List of rules:"))
+	for _, rule := range rules {
+		Eventually(string(process.Out.Contents())).Should(ContainSubstring(rule))
+	}
+}
+
+func CopyFile(srcFile string, destFile string) {
+	b, err := ioutil.ReadFile(srcFile)
+	Expect(err).NotTo(HaveOccurred())
+	err = ioutil.WriteFile(destFile, b, 0644)
+	Expect(err).NotTo(HaveOccurred())
+}
+
+func CreateCustomRulesPath() string {
+	By("creating the SEEKRET_RULES_PATH folder")
+	rulesDir, err := ioutil.TempDir("", "repo")
+	Expect(err).NotTo(HaveOccurred())
+
+	By("setting the SEEKRET_RULES_PATH")
+	err = os.Setenv("SEEKRET_RULES_PATH", rulesDir)
+	Expect(err).NotTo(HaveOccurred())
+	return rulesDir
+}
+
+func InitLocalConfig(rulesPath string, repoDir string) {
+	By("calling the config --init and checking the output")
+	process := GitSeekret("config", "--init")
+	CheckConfigStdOut(process, rulesPath)
+
+	By("checking the local git config")
+	config, err := GetLocalGitConfig(repoDir)
+	Expect(err).NotTo(HaveOccurred())
+	defer config.Free()
+	// Check the config file
+	CheckConfigFile(config, rulesPath)
+
+	By("calling config again, it should just print out the config again.")
+	process = GitSeekret("config")
+	CheckConfigStdOut(process, rulesPath)
+}
 
 func GitSeekret(args ...string) *Session {
 	cmd := exec.Command(exePath, args...)
