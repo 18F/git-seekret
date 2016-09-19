@@ -12,6 +12,10 @@ imports:
   version: 9c4bfc0173e290759f33f37c0dcdb9af924be939
 - name: github.com/libgit2/git2go
   version: 1c8297ab834aa3ca5f3c4128ded2758a680a9e60
+- name: github.com/onsi/ginkgo
+  version: 45a5f6ffb2a14e4f29698c16ae4c0a34018a8951
+- name: github.com/onsi/gomega
+  version: d59fa0ac68bb5dd932ee8d24eed631cdd519efc3
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: gopkg.in/yaml.v2

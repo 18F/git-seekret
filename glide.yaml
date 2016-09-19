@@ -6,3 +6,5 @@ import:
   - sources/git
 - package: github.com/libgit2/git2go
 - package: github.com/urfave/cli
+- package: github.com/onsi/gomega
+- package: github.com/onsi/ginkgo
