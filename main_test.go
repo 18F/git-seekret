@@ -130,7 +130,7 @@ var _ = Describe("main", func() {
 			AfterEach(func() {
 				os.RemoveAll(rulesDir)
 			})
-			It("should nothing when there are no rules in the directory", func() {
+			It("should show nothing when there are no rules in the directory", func() {
 				process := GitSeekret("rules")
 				VerifyRules(process, []string{})
 
@@ -153,6 +153,48 @@ var _ = Describe("main", func() {
 				VerifyRules(process, []string{"[ ] password.password", "[ ] password.pwd", "[ ] password.pass", "[ ] password.cred"})
 			})
 		})
+	})
+	Describe("check", func() {
+		var rulesDir string
+		BeforeEach(func() {
+			rulesDir = CreateCustomRulesPath()
+			InitLocalConfig(rulesDir, repoDir)
+			CopyRuleFixtures(oldDir, rulesDir)
+		})
+		AfterEach(func() {
+			os.RemoveAll(rulesDir)
+		})
+		Context("when checking staged changes", func() {
+			Context("when there are no files", func() {
+				It("should detect no violations", func() {
+					process := GitSeekret("check", "-s")
+					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 0"))
+				})
+			})
+			Context("when there is a staged file but with no violation", func() {
+				It("should detect no violations", func() {
+					CopyFile(filepath.Join(oldDir, "fixtures", "files", "noviolation.txt"), filepath.Join("noviolation.txt"))
+					cmd := exec.Command("git", "add", "noviolation.txt")
+					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+					Eventually(session).Should(Exit(0))
+					Expect(err).NotTo(HaveOccurred())
+					process := GitSeekret("check", "-s")
+					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 0"))
+				})
+			})
+			Context("when there is a staged file but with a violation", func() {
+				It("should detect 1 violation", func() {
+					CopyFile(filepath.Join(oldDir, "fixtures", "files", "noviolation.txt"), filepath.Join("pwdviolation00.txt"))
+					cmd := exec.Command("git", "add", "pwdviolation00.txt")
+					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+					Eventually(session).Should(Exit(0))
+					Expect(err).NotTo(HaveOccurred())
+					process := GitSeekret("check", "-s")
+					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 1"))
+				})
+			})
+		})
+
 	})
 })
 
