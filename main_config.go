@@ -5,7 +5,6 @@ import (
 	"github.com/libgit2/git2go"
 	"github.com/urfave/cli"
 	"strings"
-	"os"
 )
 
 func GitSeekretConfig(c *cli.Context) error {
@@ -37,19 +36,6 @@ func GitSeekretConfig(c *cli.Context) error {
 
 		err := setConfig(gs.config, key, value)
 		if err != nil {
-			return err
-		}
-	}
-
-	// if the folder does not exist, let's create it.
-	if _, err := os.Stat(gs.config.rulespath); err != nil {
-		if os.IsNotExist(err) {
-			// file does not exist
-			err = os.MkdirAll(gs.config.rulespath, 0644)
-			if err != nil {
-				return err
-			}
-		} else {
 			return err
 		}
 	}
