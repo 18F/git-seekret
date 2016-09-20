@@ -204,6 +204,39 @@ var _ = Describe("main", func() {
 		})
 
 	})
+	Describe("hook", func() {
+		var rulesDir string
+		BeforeEach(func() {
+			rulesDir = CreateCustomRulesPath()
+			InitLocalConfig(rulesDir, repoDir)
+			CopyRuleFixtures(oldDir, rulesDir)
+			GitSeekret("rules", "--enable", "password.pwd")
+			GitSeekret("rules", "--enable", "password.password")
+			VerifyRules(GitSeekret("rules"), []string{"[x] password.password", "[x] password.pwd", "[ ] password.pass", "[ ] password.cred"})
+			AddFixtureFileToRepo(oldDir, "pwdviolation00.txt")
+		})
+		AfterEach(func() {
+			os.RemoveAll(rulesDir)
+		})
+		Context("when the hook is not enabled", func() {
+			It("should not detect a violation when committing a bad file", func() {
+				cmd := exec.Command("git", "commit", "-m", "test")
+				session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+				Eventually(session).Should(Exit(0))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+		Context("when the hook is enabled", func() {
+			It("should detect a violation when committing a bad file", func() {
+				GitSeekret("hook", "--enable-all")
+				cmd := exec.Command("git", "commit", "-m", "test")
+				session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+				Eventually(session).Should(Exit(1))
+				Eventually(string(session.Err.Contents())).Should(ContainSubstring("Found Secrets: 1"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
 })
 
 func AddFixtureFileToRepo(oldDir string, fileName string) {
