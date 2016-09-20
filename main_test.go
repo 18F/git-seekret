@@ -111,7 +111,7 @@ var _ = Describe("main", func() {
 		Context("when it initialized to a config locally", func() {
 			It("should create the config for the local config.", func() {
 				os.Setenv("SEEKRET_RULES_PATH", "") // Make sure the SEEKRET_RULES_PATH is not set.
-				Skip("have to skip beacuse we need a way to create the default path if it doesn't exist.")
+				Skip("have to skip because we need a way to create the default path if it doesn't exist.")
 				rulesPath := seekret.DefaultRulesPath()
 				InitLocalConfig(rulesPath, repoDir)
 			})
