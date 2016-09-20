@@ -160,6 +160,9 @@ var _ = Describe("main", func() {
 			rulesDir = CreateCustomRulesPath()
 			InitLocalConfig(rulesDir, repoDir)
 			CopyRuleFixtures(oldDir, rulesDir)
+			GitSeekret("rules", "--enable", "password.pwd")
+			GitSeekret("rules", "--enable", "password.password")
+			VerifyRules(GitSeekret("rules"), []string{"[x] password.password", "[x] password.pwd", "[ ] password.pass", "[ ] password.cred"})
 		})
 		AfterEach(func() {
 			os.RemoveAll(rulesDir)
@@ -173,30 +176,40 @@ var _ = Describe("main", func() {
 			})
 			Context("when there is a staged file but with no violation", func() {
 				It("should detect no violations", func() {
-					CopyFile(filepath.Join(oldDir, "fixtures", "files", "noviolation.txt"), filepath.Join("noviolation.txt"))
-					cmd := exec.Command("git", "add", "noviolation.txt")
-					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
-					Eventually(session).Should(Exit(0))
-					Expect(err).NotTo(HaveOccurred())
+					AddFixtureFileToRepo(oldDir, "noviolation.txt")
 					process := GitSeekret("check", "-s")
 					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 0"))
 				})
 			})
 			Context("when there is a staged file but with a violation", func() {
 				It("should detect 1 violation", func() {
-					CopyFile(filepath.Join(oldDir, "fixtures", "files", "noviolation.txt"), filepath.Join("pwdviolation00.txt"))
-					cmd := exec.Command("git", "add", "pwdviolation00.txt")
-					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
-					Eventually(session).Should(Exit(0))
-					Expect(err).NotTo(HaveOccurred())
+					AddFixtureFileToRepo(oldDir, "pwdviolation00.txt")
 					process := GitSeekret("check", "-s")
 					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 1"))
+				})
+			})
+			Context("when there is a staged file w/ a violation added after another file with a violation", func() {
+				It("should detect 2 violation", func() {
+					AddFixtureFileToRepo(oldDir, "pwdviolation00.txt")
+					process := GitSeekret("check", "-s")
+					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 1"))
+					AddFixtureFileToRepo(oldDir, "pwdviolation01.txt")
+					process = GitSeekret("check", "-s")
+					Eventually(string(process.Out.Contents())).Should(ContainSubstring("Found Secrets: 2"))
 				})
 			})
 		})
 
 	})
 })
+
+func AddFixtureFileToRepo(oldDir string, fileName string) {
+	CopyFile(filepath.Join(oldDir, "fixtures", "files", fileName), filepath.Join(fileName))
+	cmd := exec.Command("git", "add", fileName)
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+	Eventually(session).Should(Exit(0))
+	Expect(err).NotTo(HaveOccurred())
+}
 
 func CopyRuleFixtures(oldDir, rulesDir string) {
 	CopyFile(filepath.Join(oldDir, "fixtures", "rules", "password.rule"), filepath.Join(rulesDir, "password.rule"))
