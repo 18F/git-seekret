@@ -233,6 +233,7 @@ var _ = Describe("main", func() {
 				session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 				Eventually(session).Should(Exit(1))
 				Eventually(string(session.Err.Contents())).Should(ContainSubstring("Found Secrets: 1"))
+				Eventually(string(session.Err.Contents())).Should(ContainSubstring("commit cannot proceed"))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
