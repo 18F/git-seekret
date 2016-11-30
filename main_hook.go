@@ -5,6 +5,7 @@ import (
 	"github.com/libgit2/git2go"
 	"github.com/urfave/cli"
 	"os"
+	"path"
 )
 
 type GitSeekretHookHandler struct {
@@ -75,6 +76,10 @@ func GitSeekretHook(c *cli.Context) error {
 				return err
 			}
 		}
+	}
+
+	if run == "" {
+		listEnabledHooks()
 	}
 
 	return nil
@@ -163,4 +168,30 @@ func getHookFile(name string) (string, error) {
 		hookfile = fmt.Sprintf("%s/%s", hookspath, name)
 	}
 	return hookfile, nil
+}
+
+func listEnabledHooks() error {
+	var n int
+
+	hookdir := fmt.Sprintf("%s/hooks", gs.repo)
+
+	hd, err := os.Open(hookdir)
+	if err != nil {
+		return err
+	}
+	defer hd.Close()
+
+	hooks, err := hd.Readdirnames(n)
+	fmt.Printf("Hooks Found:\n")
+	for _, hookfile := range hooks {
+		if path.Ext(hookfile) == "" {
+			fmt.Printf("\t%s\n", hookfile)
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
