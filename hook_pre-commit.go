@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/urfave/cli"
 )
 
 func HookPreCommitEnable(args []string) (string, error) {
@@ -14,8 +14,8 @@ func HookPreCommitDisable(args []string) error {
 
 func HookPreCommitRun(args []string) error {
 	options := map[string]interface{}{
-		"commit": false,
-		"staged": true,
+		"commit-files": false,
+		"staged-files": true,
 	}
 
 	secrets, err := gs.RunCheck(options)
@@ -23,7 +23,7 @@ func HookPreCommitRun(args []string) error {
 		return err
 	}
 	if secrets != 0 {
-		return fmt.Errorf("commit cannot proceed")
+		return cli.NewExitError("commit cannot proceed", 42)
 	}
 
 	return nil
