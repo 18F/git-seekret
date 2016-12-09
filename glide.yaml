@@ -1,8 +1,8 @@
-package: github.com/apuigsech/git-seekret
+package: github.com/18F/git-seekret
 import:
-- package: github.com/apuigsech/seekret
+- package: github.com/18F/seekret
   subpackages:
   - models
-- package: github.com/apuigsech/seekret-source-git
+  - sources/git
 - package: github.com/libgit2/git2go
 - package: github.com/urfave/cli

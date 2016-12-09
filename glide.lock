@@ -1,12 +1,11 @@
-hash: fff9f76b302f500e6a9030278cb766346f89016e3e43bfa5e56a9b6a11900fd8
-updated: 2016-11-02T12:05:57.515116073-04:00
+hash: a83e554c731d44030019154c57b1f28082b195d5024cd9ce54990e01e20ee106
+updated: 2016-12-09T15:29:09.355940987-05:00
 imports:
-- name: github.com/apuigsech/seekret
-  version: 3e7a141d7fb7142216328d037019a376b002eea2
+- name: github.com/18F/seekret
+  version: 3a488ae6ad848bdd46017a1b4d6ccc2786903fb4
   subpackages:
   - models
-- name: github.com/apuigsech/seekret-source-git
-  version: 7a67416c70d760854c209bc9bf137b3791dab445
+  - sources/git
 - name: github.com/codahale/blake2
   version: 8d10d0420cbfbdc9c1164c0c4ad3457a6c3771b9
 - name: github.com/emptyinterface/sshconfig
@@ -14,7 +13,7 @@ imports:
 - name: github.com/libgit2/git2go
   version: 1c8297ab834aa3ca5f3c4128ded2758a680a9e60
 - name: github.com/urfave/cli
-  version: d86a009f5e13f83df65d0d6cee9a2e3f1445f0da
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []

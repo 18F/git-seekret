@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/apuigsech/seekret-source-git"
+	"github.com/18F/seekret/sources/git"
 	"runtime"
 )
 
