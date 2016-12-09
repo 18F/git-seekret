@@ -113,7 +113,8 @@ func GitSeekretHookEnable(name string) error {
 	}
 	defer fh.Close()
 
-	fh.WriteString("#!/usr/bin/env bash\n\n")
+	fh.WriteString("#!/usr/bin/env bash\n")
+	fh.WriteString("PATH=$PATH:/usr/local/bin:/usr/local/sbin\n\n")
 	fh.WriteString(script)
 	fh.Close()
 
