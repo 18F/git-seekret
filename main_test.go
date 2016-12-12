@@ -1,8 +1,8 @@
 package main_test
 
 import (
-	. "github.com/apuigsech/git-seekret"
-	"github.com/apuigsech/seekret"
+	. "github.com/18F/git-seekret"
+	"github.com/18F/seekret"
 	"github.com/libgit2/git2go"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,7 +16,7 @@ import (
 var exePath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	path, buildErr := Build("github.com/apuigsech/git-seekret")
+	path, buildErr := Build("github.com/18F/git-seekret")
 	Expect(buildErr).NotTo(HaveOccurred())
 	return []byte(path)
 }, func(data []byte) {
