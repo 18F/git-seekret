@@ -39,7 +39,7 @@ VERSION:
    0.0.1`
 
 var helpAuthor = `
-AUTHOR(S):
+AUTHOR:
    Albert Puigsech Galicia <albert@puigsech.com>`
 
 var helpCommands = `COMMANDS:
