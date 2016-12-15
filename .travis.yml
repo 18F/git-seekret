@@ -6,10 +6,11 @@ matrix:
       dist: trusty
       sudo: required
       before_install:
+        - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe" >> /etc/apt/sources.list'
         - sudo apt-get update -qq
         - sudo apt-get install -y pkg-config libgit2-dev cmake shellcheck
       before_script:
-        - sudo apt-get remove -y libgit2*
+        - sudo apt-get remove -y libgit2-*
     - os: osx
       osx_image: xcode8.1
       before_install:
