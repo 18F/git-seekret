@@ -63,7 +63,9 @@ function compile_git_seekrets() {
       SUFFIX=osx
       ;;
     *)
-      echo "unknown: $OSTYPE"
+      echo "unknown platform: $OSTYPE"
+      echo "Trying to build anyway"
+      SUFFIX=$OSTYPE
       ;;
   esac
 
