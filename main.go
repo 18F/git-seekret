@@ -79,9 +79,19 @@ func main() {
 					Usage: "include commited files. Argument is the number of commits to inspect (0 = all)",
 					Value: 0,
 				},
+				cli.StringFlag{
+					Name:  "enable, e",
+					Usage: "TBD",
+					Value: "",
+				},
+				cli.StringFlag{
+					Name:  "disable, d",
+					Usage: "TBD",
+					Value: "",
+				},
 				cli.BoolFlag{
 					Name:  "staged, s",
-					Usage: "include staged files",
+					Usage: "[deprecated]",
 				},
 			},
 		},
