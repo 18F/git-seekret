@@ -1,5 +1,5 @@
-hash: a83e554c731d44030019154c57b1f28082b195d5024cd9ce54990e01e20ee106
-updated: 2016-12-09T15:29:09.355940987-05:00
+hash: 89f3fedc11b3f96ef357df09ecea5a6b149aa378c73cd30b3096a5d0966e952e
+updated: 2016-12-12T15:52:16.789136561-05:00
 imports:
 - name: github.com/18F/seekret
   version: 3a488ae6ad848bdd46017a1b4d6ccc2786903fb4
@@ -12,8 +12,47 @@ imports:
   version: 9c4bfc0173e290759f33f37c0dcdb9af924be939
 - name: github.com/libgit2/git2go
   version: 1c8297ab834aa3ca5f3c4128ded2758a680a9e60
+- name: github.com/onsi/ginkgo
+  version: c07a44f02cf4a895e331f4f473c0943ee116c668
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
+- name: github.com/onsi/gomega
+  version: ff4bc6b6f9f5affa66635cd04d31d2a7ee21ffd6
+  subpackages:
+  - format
+  - gbytes
+  - gexec
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: gopkg.in/yaml.v2
-  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
-testImports: []
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
+testImports:
+- name: golang.org/x/sys
+  version: 9a2e24c3733eddc63871eda99f253e2db29bd3b9
+  subpackages:
+  - unix

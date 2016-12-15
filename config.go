@@ -171,17 +171,21 @@ func (gs *gitSeekret) RunConfig() error {
 	return nil
 }
 
+func GetLocalGitConfig(repo string) (*git.Config, error) {
+	r, err := git.OpenRepositoryExtended(repo, git.RepositoryOpenCrossFs, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Config()
+}
+
 func openGitConfig(configLevel git.ConfigLevel, repo string) (*git.Config, error) {
 	var gitConfig *git.Config
 	var err error
 
 	if configLevel == git.ConfigLevelLocal {
-		r, err := git.OpenRepositoryExtended(repo, git.RepositoryOpenCrossFs, "")
-		if err != nil {
-			return nil, err
-		}
-
-		gitConfig, err = r.Config()
+		gitConfig, err = GetLocalGitConfig(repo)
 		if err != nil {
 			return nil, err
 		}
