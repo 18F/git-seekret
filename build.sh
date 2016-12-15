@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This build script will any binaries that the laptop script needs
 # and places them inside the releases folder.
@@ -29,8 +29,6 @@ function compile_libgit() {
 
 function compile_git_seekrets() {
 
-  local OS="$1" ARCH="$2" SUFFIX="$3"
-
   if which go > /dev/null; then
     echo "Found Go toolchain"
   else
@@ -55,8 +53,21 @@ function compile_git_seekrets() {
   glide install
 
   # build it
-  export GOOS="$OS"
-  export GOARCH="$ARCH"
+  case $OSTYPE in
+    linux*)
+      export GOOS=linux
+      SUFFIX=linux
+      ;;
+    darwin*)
+      export GOOS=darwin
+      SUFFIX=osx
+      ;;
+    *)
+      echo "unknown: $OSTYPE"
+      ;;
+  esac
+
+  export GOARCH=amd64
   export PKG_CONFIG_PATH=${RELEASE_PATH}/libgit2/lib/pkgconfig:${PKG_CONFIG_PATH}
   export LIBGIT_PCFILE="${RELEASE_PATH}/libgit2/lib/pkgconfig/libgit2.pc"
   FLAGS=$(pkg-config --static --libs "$LIBGIT_PCFILE") || exit 1
@@ -69,15 +80,7 @@ function compile_git_seekrets() {
   echo
 }
 
-function compile_git_seekrets_Darwin() {
-  compile_git_seekrets darwin amd64 osx
-}
-
-function compile_git_seekrets_Linux() {
-  compile_git_seekrets linux amd64 linux
-}
-
 rm -rf "$RELEASE_PATH"
 mkdir -p "$RELEASE_PATH"
 
-compile_git_seekrets_$(uname -s)
+compile_git_seekrets
