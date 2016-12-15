@@ -5,21 +5,18 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
+      addons:
+        apt:
+          packages:
+          - cmake
+          - pkg-config
+          - shellcheck
     - os: osx
-      osx_image: xcode7.2
-
-before_install:
-  - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe" >> /etc/apt/sources.list'
-  - sudo add-apt-repository ppa:masterminds/glide -y
-  - sudo apt-get update
-  - sudo apt-get install -y pkg-config libgit2-dev
-  - sudo apt-get install glide
-  - sudo apt-get clean
-
-install:
-  - glide install
-  - go build
+      osx_image: xcode8.1
+      before_script:
+        - brew install shellcheck
 
 script:
-  - go test $(glide nv)
+  - shellcheck build.sh
   - ./build.sh
+  - go test $(glide nv)
