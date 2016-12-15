@@ -12,8 +12,7 @@ matrix:
     - os: osx
       osx_image: xcode8.1
       before_install:
-        - brew install shellcheck
-        - brew install libgit2
+        - brew install pkg-config libgit2 cmake shellcheck
 
 script:
   - shellcheck build.sh
