@@ -16,3 +16,9 @@ install:
 
 script:
   - go test $(glide nv)
+
+before_deploy:
+  - build.sh
+
+deploy:
+  skip_cleanup: true
