@@ -80,8 +80,8 @@ func main() {
 					Value: 0,
 				},
 				cli.BoolFlag{
-					Name:  "staged, s",
-					Usage: "[deprecated]",
+					Name:  "no-staged, n",
+					Usage: "disable checking of staged files (default: staged files are checked)",
 				},
 			},
 		},
