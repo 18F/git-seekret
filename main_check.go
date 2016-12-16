@@ -26,10 +26,6 @@ func GitSeekretCheck(c *cli.Context) error {
 		options["commit-count"] = c.Int("commit")
 	}
 
-	if c.IsSet("no-staged") {
-		options["staged-files"] = false
-	}
-
 	secrets, err := gs.RunCheck(options)
 	if err != nil {
 		return err
