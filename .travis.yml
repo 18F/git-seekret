@@ -1,18 +1,20 @@
 language: go
-dist: trusty
-sudo: required
 
-before_install:
-  - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe" >> /etc/apt/sources.list'
-  - sudo add-apt-repository ppa:masterminds/glide -y
-  - sudo apt-get update
-  - sudo apt-get install -y pkg-config libgit2-dev
-  - sudo apt-get install glide
-  - sudo apt-get clean
-
-install:
-  - glide install
-  - go build
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      before_install:
+        - sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial main restricted universe" >> /etc/apt/sources.list'
+        - sudo apt-get update -qq
+        - sudo apt-get install -y pkg-config libgit2-dev cmake shellcheck
+    - os: osx
+      osx_image: xcode8.1
+      before_install:
+        - brew install pkg-config libgit2 cmake shellcheck glide
 
 script:
+  - shellcheck build.sh
+  - ./build.sh
   - go test $(glide nv)
