@@ -15,22 +15,6 @@ func GitSeekretCheck(c *cli.Context) error {
 		return err
 	}
 
-	enable := c.String("enable")
-	disable := c.String("disable")
-
-	if enable != "" {
-
-		if err != nil {
-			return err
-		}
-	}
-
-	if disable != "" {
-		if err != nil {
-			return err
-		}
-	}
-
 	options := map[string]interface{}{
 		"commit-files": false,
 		"staged-files": true,
