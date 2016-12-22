@@ -1,3 +1,6 @@
 .idea
 git-seekret
 vendor
+releases
+libgit*
+*.tar.gz
