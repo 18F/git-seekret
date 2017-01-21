@@ -7,11 +7,12 @@
 # a GitHub Release for them to be publiclly accessible.
 set -e
 
-LIBGITVER="0.24.0"
+LIBGITVER="0.25.0"
 RELEASE_PATH=$(pwd)/releases
 
 function compile_libgit() {
   rm -rf "$RELEASE_PATH/libgit2"
+  rm -rf libgit2-${LIBGITVER}
   if [ ! -f libgit2-${LIBGITVER}.tar.gz ]; then
     curl -L -o libgit2-${LIBGITVER}.tar.gz https://github.com/libgit2/libgit2/archive/v${LIBGITVER}.tar.gz
   fi
@@ -24,7 +25,6 @@ function compile_libgit() {
         -DCMAKE_C_FLAGS=-fPIC \
         -DCMAKE_INSTALL_PREFIX="$RELEASE_PATH/libgit2" .. \
     && cmake --build . --target install)
-  rm -rf libgit2-${LIBGITVER}
 }
 
 function compile_git_seekrets() {
@@ -51,6 +51,7 @@ function compile_git_seekrets() {
   fi
   rm -rf vendor
   glide install
+  ln -sf "$(pwd)/libgit2-${LIBGITVER}/build" "${GOPATH}/src/github.com/18F/git-seekret/vendor/github.com/libgit2/git2go/vendor/libgit2/build"
 
   # build it
   case $OSTYPE in
@@ -76,7 +77,7 @@ function compile_git_seekrets() {
   export CGO_LDFLAGS="${RELEASE_PATH}/libgit2/lib/libgit2.a -L${RELEASE_PATH}/libgit2/lib ${FLAGS}"
   export CGO_CFLAGS="-I${RELEASE_PATH}/libgit2/include"
   BINARY="$RELEASE_PATH/git-seekret-$SUFFIX"
-  go build -ldflags "-linkmode external -extldflags '${CGO_LDFLAGS}'" -o "$BINARY"
+  go build -tags static -ldflags "-linkmode external -extldflags '${CGO_LDFLAGS}'" -o "$BINARY"
   echo
   echo "Build complete. Release binary: $BINARY"
   echo

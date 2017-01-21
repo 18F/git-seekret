@@ -14,7 +14,23 @@ matrix:
       before_install:
         - brew install pkg-config libgit2 cmake shellcheck glide
 
-script:
+install:
   - shellcheck build.sh
   - ./build.sh
-  - go test $(glide nv)
+
+script:
+  - ./releases/git-seekret-*
+  - go test -tags static $(glide nv)
+
+# before_deploy:
+#   - export RELEASE_FILE=$(ls releases/git-seekret-*)
+
+# deploy:
+#   provider: releases
+#   api_key: GITHUB_API_KEY_GOES_HERE
+#   file_glob: true
+#   file: "${RELEASE_FILE}"
+#   skip_cleanup: true
+#   overwrite: true
+#   on:
+#     tags: true
