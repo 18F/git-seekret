@@ -22,7 +22,7 @@ function compile_openssl() {
   tar -xvf openssl-${OPENSSLVER}.tar.gz
   pushd openssl-${OPENSSLVER}
   export KERNEL_BITS=64
-  ./config no-shared no-ssl2 no-ssl3 --prefix=${RELEASE_PATH}/openssl --openssldir=${RELEASE_PATH}/openssl
+  ./config no-shared no-ssl2 no-ssl3 --prefix="${RELEASE_PATH}/openssl" --openssldir="${RELEASE_PATH}/openssl"
   make depend && make
   make install
   popd
@@ -57,7 +57,7 @@ function compile_libcurl() {
   pushd curl-${LIBCURLVER}
   export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
-  ./configure --with-ssl --with-libssh2 --disable-shared --prefix=${RELEASE_PATH}/curl
+  ./configure --with-ssl --with-libssh2 --disable-shared --prefix="${RELEASE_PATH}/curl"
   make && make install
   popd
 }
