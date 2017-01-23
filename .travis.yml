@@ -22,6 +22,11 @@ script:
   - ./releases/git-seekret-*
   - go test -tags static $(glide nv)
 
+addons:
+  artifacts:
+    s3_region: "us-gov-west-1" # defaults to "us-east-1"
+    paths: $(ls releases/git-seekret-* | tr "\n" ":")
+
 # before_deploy:
 #   - export RELEASE_FILE=$(ls releases/git-seekret-*)
 
