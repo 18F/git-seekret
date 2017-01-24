@@ -41,7 +41,9 @@ function compile_libssh() {
   export PKG_CONFIG_PATH="${RELEASE_PATH}/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSL_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libssl.pc"
   export LIBCRYPTO_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libcrypto.pc"
-  ./configure --disable-shared --with-libssl-prefix="${RELEASE_PATH}/openssl" --prefix="${RELEASE_PATH}/libssh2"
+  LIBSSL_FLAGS=$(pkg-config --static --libs "$LIBSSL_PCFILE") || exit 1
+  LIBCRYPTO_FLAGS=$(pkg-config --static --libs "$LIBCRYPTO_PCFILE") || exit 1
+  LDFLAGS="${LIBSSL_FLAGS} ${LIBCRYPTO_FLAGS}" ./configure --disable-shared --with-libssl-prefix="${RELEASE_PATH}/openssl" --prefix="${RELEASE_PATH}/libssh2"
   make && make install
   popd
 }
@@ -57,7 +59,8 @@ function compile_libcurl() {
   pushd curl-${LIBCURLVER}
   export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
-  ./configure --with-ssl="${RELEASE_PATH}/openssl" --with-libssh2="${RELEASE_PATH}/libssh2" --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
+  LIBSSH2_FLAGS=$(pkg-config --static --libs "${LIBSSH2_PCFILE}") || exit 1
+  LDFLAGS="${LIBSSH2_FLAGS} ${LIBSSL_FLAGS} ${LIBCRYPTO_FLAGS}" ./configure --with-ssl="${RELEASE_PATH}/openssl" --with-libssh2="${RELEASE_PATH}/libssh2" --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
   make && make install
   popd
 }
