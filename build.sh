@@ -57,7 +57,7 @@ function compile_libcurl() {
   pushd curl-${LIBCURLVER}
   export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
-  ./configure --with-ssl --with-libssh2 --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
+  ./configure --with-ssl="${RELEASE_PATH}/openssl" --with-libssh2="${RELEASE_PATH}/libssh2" --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
   make && make install
   popd
 }
