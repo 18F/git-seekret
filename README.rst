@@ -19,24 +19,24 @@ included into a commit.
 Installing git-seekret
 ======================
 
-First, install its dependencies:
+1. install its dependencies:
 
 * `Glide <https://github.com/Masterminds/glide#install>`_
 * pkg-config
 * golang >= 1.6
-* libgit >= 2.24
+* libgit2
 
-
+2. build the `git-seekret` executable by cloning this repo, and then in the root directory:
 ::
 
-	glide install
-	go build
+	$ glide install
+	$ go build
 
 This builds a binary ``git-seekret``.  Currently, there is no cross platform  way to install ``git-seekret`` (e.g. Install via Brew for OS X). To make the binary widely available to the user, you need to copy it to the system's ``bin`` folder.
 
 ::
 
-        cp ./git-seekret /usr/local/bin
+        $ cp ./git-seekret /usr/local/bin
 
 Usage
 =====
