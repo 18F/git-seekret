@@ -19,7 +19,7 @@ function compile_openssl() {
   if [ ! -f openssl-1.0.2j.tar.gz ]; then
     curl -L -o openssl-${OPENSSLVER}.tar.gz https://www.openssl.org/source/openssl-${OPENSSLVER}.tar.gz
   fi
-  tar -xvf openssl-${OPENSSLVER}.tar.gz
+  tar -xzf openssl-${OPENSSLVER}.tar.gz
   pushd openssl-${OPENSSLVER}
   export KERNEL_BITS=64
   ./config no-shared no-ssl2 no-ssl3 --prefix="${RELEASE_PATH}/openssl" --openssldir="${RELEASE_PATH}/openssl"
@@ -55,7 +55,7 @@ function compile_libcurl() {
   if [ ! -f curl-${LIBCURLVER}.tar.gz ]; then
     curl -L -o curl-${LIBCURLVER}.tar.gz https://curl.haxx.se/download/curl-${LIBCURLVER}.tar.gz
   fi
-  tar -xvf curl-${LIBCURLVER}.tar.gz
+  tar -xzf curl-${LIBCURLVER}.tar.gz
   pushd curl-${LIBCURLVER}
   export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
