@@ -7,24 +7,84 @@
 # a GitHub Release for them to be publiclly accessible.
 set -e
 
-LIBGITVER="0.24.0"
+LIBGITVER="0.25.1"
+LIBSSHVER="1.8.0"
+LIBCURLVER="7.52.1"
+OPENSSLVER="1.0.2j"
+
 RELEASE_PATH=$(pwd)/releases
 
+function compile_openssl() {
+  rm -rf openssl-${OPENSSLVER}
+  if [ ! -f openssl-1.0.2j.tar.gz ]; then
+    curl -L -o openssl-${OPENSSLVER}.tar.gz https://www.openssl.org/source/openssl-${OPENSSLVER}.tar.gz
+  fi
+  tar -xzf openssl-${OPENSSLVER}.tar.gz
+  pushd openssl-${OPENSSLVER}
+  export KERNEL_BITS=64
+  ./config no-shared no-ssl2 no-ssl3 --prefix="${RELEASE_PATH}/openssl" --openssldir="${RELEASE_PATH}/openssl"
+  make depend && make
+  make install
+  popd
+}
+
+function compile_libssh() {
+  compile_openssl
+
+  rm -rf libssh2-${LIBSSHVER}
+
+  if [ ! -f libssh2-${LIBSSHVER}.tar.gz ]; then
+    curl -L -o libssh2-${LIBSSHVER}.tar.gz https://www.libssh2.org/download/libssh2-${LIBSSHVER}.tar.gz
+  fi
+  tar -xzf libssh2-${LIBSSHVER}.tar.gz
+  pushd libssh2-${LIBSSHVER}
+  export PKG_CONFIG_PATH="${RELEASE_PATH}/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}"
+  export LIBSSL_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libssl.pc"
+  export LIBCRYPTO_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libcrypto.pc"
+  LIBSSL_FLAGS=$(pkg-config --static --libs "$LIBSSL_PCFILE") || exit 1
+  LIBCRYPTO_FLAGS=$(pkg-config --static --libs "$LIBCRYPTO_PCFILE") || exit 1
+  LDFLAGS="${LIBSSL_FLAGS} ${LIBCRYPTO_FLAGS}" ./configure --disable-shared --with-libssl-prefix="${RELEASE_PATH}/openssl" --prefix="${RELEASE_PATH}/libssh2"
+  make && make install
+  popd
+}
+
+function compile_libcurl() {
+  compile_libssh
+
+  rm -rf curl-${LIBCURLVER}
+  if [ ! -f curl-${LIBCURLVER}.tar.gz ]; then
+    curl -L -o curl-${LIBCURLVER}.tar.gz https://curl.haxx.se/download/curl-${LIBCURLVER}.tar.gz
+  fi
+  tar -xzf curl-${LIBCURLVER}.tar.gz
+  pushd curl-${LIBCURLVER}
+  export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
+  export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
+  LIBSSH2_FLAGS=$(pkg-config --static --libs "${LIBSSH2_PCFILE}") || exit 1
+  LDFLAGS="${LIBSSH2_FLAGS} ${LIBSSL_FLAGS} ${LIBCRYPTO_FLAGS}" ./configure --with-ssl="${RELEASE_PATH}/openssl" --with-libssh2="${RELEASE_PATH}/libssh2" --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
+  make && make install
+  popd
+}
+
 function compile_libgit() {
+  compile_libcurl
+
   rm -rf "$RELEASE_PATH/libgit2"
+  rm -rf libgit2-${LIBGITVER}
   if [ ! -f libgit2-${LIBGITVER}.tar.gz ]; then
     curl -L -o libgit2-${LIBGITVER}.tar.gz https://github.com/libgit2/libgit2/archive/v${LIBGITVER}.tar.gz
   fi
   tar -xzf libgit2-${LIBGITVER}.tar.gz
   mkdir -p libgit2-${LIBGITVER}/build
-  (cd libgit2-${LIBGITVER}/build \
-    && cmake -DTHREADSAFE=ON \
+  export PKG_CONFIG_PATH="${RELEASE_PATH}/curl/lib/pkgconfig:${PKG_CONFIG_PATH}"
+  export LIBCURL_PCFILE="${RELEASE_PATH}/curl/lib/pkgconfig/libcurl.pc"
+  pushd libgit2-${LIBGITVER}/build
+  cmake -DTHREADSAFE=ON \
         -DBUILD_CLAR=OFF \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS=-fPIC \
-        -DCMAKE_INSTALL_PREFIX="$RELEASE_PATH/libgit2" .. \
-    && cmake --build . --target install)
-  rm -rf libgit2-${LIBGITVER}
+        -DCMAKE_INSTALL_PREFIX="$RELEASE_PATH/libgit2" ..
+  cmake --build . --target install
+  popd
 }
 
 function compile_git_seekrets() {
@@ -51,6 +111,7 @@ function compile_git_seekrets() {
   fi
   rm -rf vendor
   glide install
+  ln -sf "$(pwd)/libgit2-${LIBGITVER}/build" "${GOPATH}/src/github.com/18F/git-seekret/vendor/github.com/libgit2/git2go/vendor/libgit2/build"
 
   # build it
   case $OSTYPE in
@@ -70,19 +131,35 @@ function compile_git_seekrets() {
   esac
 
   export GOARCH=amd64
-  export PKG_CONFIG_PATH=${RELEASE_PATH}/libgit2/lib/pkgconfig:${PKG_CONFIG_PATH}
+  export PKG_CONFIG_PATH="${RELEASE_PATH}/libgit2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBGIT_PCFILE="${RELEASE_PATH}/libgit2/lib/pkgconfig/libgit2.pc"
-  FLAGS=$(pkg-config --static --libs "$LIBGIT_PCFILE") || exit 1
-  export CGO_LDFLAGS="${RELEASE_PATH}/libgit2/lib/libgit2.a -L${RELEASE_PATH}/libgit2/lib ${FLAGS}"
-  export CGO_CFLAGS="-I${RELEASE_PATH}/libgit2/include"
+  LIBGIT_FLAGS=$(pkg-config --static --libs "$LIBGIT_PCFILE") || exit 1
+  LIBCURL_FLAGS=$(pkg-config --static --libs "$LIBCURL_PCFILE") || exit 1
+  LIBSSL_FLAGS=$(pkg-config --static --libs "$LIBSSL_PCFILE") || exit 1
+  LIBCRYPTO_FLAGS=$(pkg-config --static --libs "$LIBCRYPTO_PCFILE") || exit 1
+  LIBSSH2_FLAGS=$(pkg-config --static --libs "$LIBSSH2_PCFILE") || exit 1
+  export CGO_LDFLAGS="$LIBGIT_FLAGS $LIBCURL_FLAGS $LIBSSL_FLAGS $LIBCRYPTO_FLAGS $LIBSSH2_FLAGS"
+  export CGO_CFLAGS="-I${RELEASE_PATH}/libgit2/include -I${RELEASE_PATH}/libssh2/include -I${RELEASE_PATH}/curl/include -I${RELEASE_PATH}/openssl/include"
   BINARY="$RELEASE_PATH/git-seekret-$SUFFIX"
-  go build -ldflags "-linkmode external -extldflags '${CGO_LDFLAGS}'" -o "$BINARY"
+  go build -tags static -ldflags "-linkmode external -extldflags '${CGO_LDFLAGS}'" -o "$BINARY"
   echo
   echo "Build complete. Release binary: $BINARY"
   echo
+}
+
+function test_git_seekrets() {
+  echo
+  echo "Trying to run git-seekret.."
+  "${RELEASE_PATH}"/git-seekret-* || exit 1
+  echo
+  echo "Running tests.."
+  go test -tags static "$(glide nv)"
+  echo
+  echo "..All Done"
 }
 
 rm -rf "$RELEASE_PATH"
 mkdir -p "$RELEASE_PATH"
 
 compile_git_seekrets
+test_git_seekrets
