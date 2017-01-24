@@ -4,31 +4,28 @@
 git-seekret
 ===========
 
-Git module to prevent from committing sensitive information into the repository.
+A Git module to keep sensitive information out of the repository.
+
 
 Description
 ===========
 
-``git-seekret`` inspect on commits and/or staged (and uncommited yet) files, to 
+``git-seekret`` inspects commits and/or staging of files, to 
 prevent adding sensitive information into the git repository. It can be easily
-integrated with git hooks, forcing it to analise all staged files before they are
+integrated with git hooks, forcing it to analyze all staged files before they are
 included into a commit.
 
 
 Installing git-seekret
 ======================
 
-It's important to have the following tools and libraries to make it work properly:
+First, install its dependencies:
 
-	* glide
-	* pkg-config
-	* golang >= 1.6
-	* libgit >= 2.24
+* `Glide <https://github.com/Masterminds/glide#install>`_
+* pkg-config
+* golang >= 1.6
+* libgit >= 2.24
 
-
-``git-seekret`` uses ``Glide`` to maintain its dependencies.
-
-Follow the instructions for installing Glide: https://github.com/Masterminds/glide#install
 
 ::
 
