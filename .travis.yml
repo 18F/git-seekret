@@ -14,13 +14,9 @@ matrix:
       before_install:
         - brew install pkg-config libgit2 cmake shellcheck glide
 
-install:
+script:
   - shellcheck build.sh
   - ./build.sh
-
-script:
-  - ./releases/git-seekret-*
-  - go test -tags static $(glide nv)
 
 addons:
   artifacts:

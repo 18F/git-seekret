@@ -41,7 +41,7 @@ function compile_libssh() {
   export PKG_CONFIG_PATH="${RELEASE_PATH}/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSL_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libssl.pc"
   export LIBCRYPTO_PCFILE="${RELEASE_PATH}/openssl/lib/pkgconfig/libcrypto.pc"
-  ./configure --disable-shared --prefix="${RELEASE_PATH}/libssh2"
+  ./configure --disable-shared --with-libssl-prefix="${RELEASE_PATH}/openssl" --prefix="${RELEASE_PATH}/libssh2"
   make && make install
   popd
 }
@@ -57,7 +57,7 @@ function compile_libcurl() {
   pushd curl-${LIBCURLVER}
   export PKG_CONFIG_PATH="${RELEASE_PATH}/libssh2/lib/pkgconfig:${PKG_CONFIG_PATH}"
   export LIBSSH2_PCFILE="${RELEASE_PATH}/libssh2/lib/pkgconfig/libssh2.pc"
-  ./configure --with-ssl --with-libssh2 --disable-shared --prefix="${RELEASE_PATH}/curl"
+  ./configure --with-ssl --with-libssh2 --without-librtmp --disable-ldap --disable-shared --prefix="${RELEASE_PATH}/curl"
   make && make install
   popd
 }
@@ -144,7 +144,19 @@ function compile_git_seekrets() {
   echo
 }
 
+function test_git_seekrets() {
+  echo
+  echo "Trying to run git-seekret.."
+  "${RELEASE_PATH}"/git-seekret-* || exit 1
+  echo
+  echo "Running tests.."
+  go test -tags static "$(glide nv)"
+  echo
+  echo "..All Done"
+}
+
 rm -rf "$RELEASE_PATH"
 mkdir -p "$RELEASE_PATH"
 
 compile_git_seekrets
+test_git_seekrets
