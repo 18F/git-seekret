@@ -14,7 +14,7 @@ func main() {
 	app := cli.NewApp()
 
 	app.Name = "git-seekret"
-	app.Version = "0.0.1"
+	app.Version = "0.0.2"
 	app.Usage = "prevent from committing sensitive information into git repository"
 
 	app.Author = "Albert Puigsech Galicia"
