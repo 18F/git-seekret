@@ -1,8 +1,8 @@
 hash: a83e554c731d44030019154c57b1f28082b195d5024cd9ce54990e01e20ee106
-updated: 2016-12-09T15:29:09.355940987-05:00
+updated: 2017-04-22T14:57:50.71592618-04:00
 imports:
 - name: github.com/18F/seekret
-  version: 3a488ae6ad848bdd46017a1b4d6ccc2786903fb4
+  version: 27bffd7845abab1dbdd480b0ef844ce9b1c1a7b1
   subpackages:
   - models
   - sources/git
@@ -11,9 +11,9 @@ imports:
 - name: github.com/emptyinterface/sshconfig
   version: 9c4bfc0173e290759f33f37c0dcdb9af924be939
 - name: github.com/libgit2/git2go
-  version: 334260d743d713a55ff3c097ec6707f2bb39e9d5
+  version: 7cd5a4e731e982391b9274e17c7f32050d8e5b15
 - name: github.com/urfave/cli
-  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
+  version: 8ba6f23b6e36d03666a14bd9421f5e3efcb59aca
 - name: gopkg.in/yaml.v2
-  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 testImports: []

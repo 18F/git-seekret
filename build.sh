@@ -9,14 +9,14 @@ set -e
 
 LIBGITVER="0.25.1"
 LIBSSHVER="1.8.0"
-LIBCURLVER="7.52.1"
-OPENSSLVER="1.0.2j"
+LIBCURLVER="7.54.0"
+OPENSSLVER="1.0.2k"
 
 RELEASE_PATH=$(pwd)/releases
 
 function compile_openssl() {
   rm -rf openssl-${OPENSSLVER}
-  if [ ! -f openssl-1.0.2j.tar.gz ]; then
+  if [ ! -f openssl-${OPENSSLVER}.tar.gz ]; then
     curl -L -o openssl-${OPENSSLVER}.tar.gz https://www.openssl.org/source/openssl-${OPENSSLVER}.tar.gz
   fi
   tar -xzf openssl-${OPENSSLVER}.tar.gz

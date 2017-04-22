@@ -12,7 +12,7 @@ matrix:
     - os: osx
       osx_image: xcode8.1
       install:
-        - brew install pkg-config cmake shellcheck glide
+        - brew install cmake shellcheck glide
 
 script:
   - shellcheck build.sh
