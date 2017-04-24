@@ -81,7 +81,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "staged, s",
-					Usage: "include staged files",
+					Usage: "include staged files (default: true)",
 				},
 			},
 		},
