@@ -13,6 +13,7 @@ LIBCURLVER="7.54.0"
 OPENSSLVER="1.0.2k"
 
 RELEASE_PATH=$(pwd)/releases
+BIN_RELEASE_PATH=$(pwd)/dist
 
 function compile_openssl() {
   rm -rf openssl-${OPENSSLVER}
@@ -140,7 +141,7 @@ function compile_git_seekrets() {
   LIBSSH2_FLAGS=$(pkg-config --static --libs "$LIBSSH2_PCFILE") || exit 1
   export CGO_LDFLAGS="$LIBGIT_FLAGS $LIBCURL_FLAGS $LIBSSL_FLAGS $LIBCRYPTO_FLAGS $LIBSSH2_FLAGS"
   export CGO_CFLAGS="-I${RELEASE_PATH}/libgit2/include -I${RELEASE_PATH}/libssh2/include -I${RELEASE_PATH}/curl/include -I${RELEASE_PATH}/openssl/include"
-  BINARY="$RELEASE_PATH/git-seekret-$SUFFIX"
+  export BINARY="$BIN_RELEASE_PATH/git-seekret-$SUFFIX"
   go build -tags static -ldflags "-linkmode external -extldflags '${CGO_LDFLAGS}'" -o "$BINARY"
   echo
   echo "Build complete. Release binary: $BINARY"
@@ -150,7 +151,7 @@ function compile_git_seekrets() {
 function test_git_seekrets() {
   echo
   echo "Trying to run git-seekret.."
-  "${RELEASE_PATH}"/git-seekret-* || exit 1
+  "$BINARY" || exit 1
   echo
   echo "Running tests.."
   go test -tags static "$(glide nv)"
@@ -158,8 +159,9 @@ function test_git_seekrets() {
   echo "..All Done"
 }
 
-rm -rf "$RELEASE_PATH"
+rm -rf "$RELEASE_PATH" "$BIN_RELEASE_PATH"
 mkdir -p "$RELEASE_PATH"
+mkdir -p "$BIN_RELEASE_PATH"
 
 compile_git_seekrets
 test_git_seekrets

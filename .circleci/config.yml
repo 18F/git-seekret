@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
+      - image: circleci/golang:1.8
+
+    working_directory: /go/src/github.com/18F/git-seekret
+
+    steps:
+      - checkout
+      - run: sudo sh -c 'echo "deb http://ftp.us.debian.org/debian/ unstable main contrib non-free" >> /etc/apt/sources.list'
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -y pkg-config cmake shellcheck
+      - run: shellcheck build.sh
+      - run: ./build.sh
+      - store_artifacts:
+          path: ./dist
+      # - deploy:
+      #     name: Deploy to github when on master
+      #     command: |
+      #       if [ "${CIRCLE_BRANCH}" == "master" ]; then
+      #         go get github.com/tcnksm/ghr
+      #         ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
+      #       fi
+
