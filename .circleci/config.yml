@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  build-linux:
     docker:
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.8
@@ -23,4 +23,34 @@ jobs:
       #         go get github.com/tcnksm/ghr
       #         ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
       #       fi
+  build-osx:
+    docker:
+      # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
+      - image: circleci/golang:1.8
 
+    working_directory: /go/src/github.com/18F/git-seekret
+
+    steps:
+      - checkout
+      - run: sudo sh -c 'echo "deb http://ftp.us.debian.org/debian/ unstable main contrib non-free" >> /etc/apt/sources.list'
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -y pkg-config cmake shellcheck clang llvm-dev libxml2-dev uuid-dev libssl-dev file bash patch make gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libgmp-dev tar xz-utils bzip2 gzip sed cpio
+      - run: shellcheck build.sh
+      - run: ./.circleci/build-osx-cross.sh
+      - run: export CROSS_DIR=/tmp/osxcross/target && export PATH=$CROSS_DIR/bin:$PATH && export SDKROOT="$CROSS_DIR/SDK/MacOSX10.11.sdk" && export OSTYPE=darwin15 && ./build.sh
+      - store_artifacts:
+          path: ./dist
+      # - deploy:
+      #     name: Deploy to github when on master
+      #     command: |
+      #       if [ "${CIRCLE_BRANCH}" == "master" ]; then
+      #         go get github.com/tcnksm/ghr
+      #         ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
+      #       fi
+
+workflows:
+  version: 2
+  build_all:
+    jobs:
+      - build-linux
+      - build-osx
