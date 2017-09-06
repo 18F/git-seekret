@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This build script will any binaries that the laptop script needs
 # and places them inside the releases folder.
