@@ -37,7 +37,13 @@ jobs:
       - run: sudo apt-get install -y pkg-config cmake shellcheck clang llvm-dev libxml2-dev uuid-dev libssl-dev file bash patch make gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libgmp-dev tar xz-utils bzip2 gzip sed cpio
       - run: shellcheck build.sh
       - run: ./.circleci/build-osx-cross.sh
-      - run: export CROSS_DIR=/tmp/osxcross/target && export PATH=$CROSS_DIR/bin:$PATH && export SDKROOT="$CROSS_DIR/SDK/MacOSX10.11.sdk" && export OSTYPE=darwin15 && ./build.sh
+      - run:
+          environment:
+            CROSS_DIR: /tmp/osxcross/target
+            PATH: "$CROSS_DIR/bin:$PATH"
+            SDKROOT: "$CROSS_DIR/SDK/MacOSX10.11.sdk"
+            OSTYPE: darwin15
+          command: ./build.sh
       - store_artifacts:
           path: ./dist
       # - deploy:
