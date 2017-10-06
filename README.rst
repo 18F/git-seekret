@@ -4,21 +4,21 @@
 git-seekret
 ===========
 
-Git module to prevent from committing sensitive information into the repository.
+Prevent yourself from committing sensitive information into your repositories.
 
 Description
 ===========
 
-``git-seekret`` inspect on commits and/or staged (and uncommited yet) files, to 
-prevent adding sensitive information into the git repository. It can be easily
-integrated with git hooks, forcing it to analise all staged files before they are
+``git-seekret`` inspects commits and/or staged (and uncommitted) files, to 
+prevent you from adding sensitive information into git repositories. You can integrate it 
+with git hooks, forcing it to analyze all staged files before they are
 included into a commit.
 
 
 Installing git-seekret
 ======================
 
-It's important to have the following tools and libraries to make it work properly:
+You need the following tools and libraries to make it work properly:
 
 	* glide
 	* pkg-config
@@ -90,7 +90,7 @@ This is needed because by default, the ``seekret`` library will look for the rul
 Hands-On
 ========
 
-The repository seekret-secrets is prepare to test ``git-seekret`, and can be used to perform the following hands-on examples:
+The repository seekret-secrets is prepared to test ``git-seekret`, and can be used to perform the following hands-on examples:
 
 ::
 
