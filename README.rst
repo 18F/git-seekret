@@ -4,7 +4,7 @@
 git-seekret
 ===========
 
-Prevent yourself from committing sensitive information into your repositories.
+Git module that prevents you from committing sensitive information into your repositories.
 
 Description
 ===========
