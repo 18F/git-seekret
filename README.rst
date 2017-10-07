@@ -14,6 +14,9 @@ prevent you from adding sensitive information into git repositories. You can int
 with git hooks, forcing it to analyze all staged files before they are
 included into a commit.
 
+For more about how and why 18F uses this module, see `"Automated scanning for sensitive information in the development lifecycle" 
+<https://18f.gsa.gov/2017/09/26/automated-scanning-for-sensitive-information/>`_.
+
 
 Installing git-seekret
 ======================
